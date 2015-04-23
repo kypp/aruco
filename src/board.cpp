@@ -43,7 +43,7 @@ namespace aruco {
     *
     *
     */
-    BoardConfiguration::BoardConfiguration ( string filePath ) throw ( cv::Exception ) {
+    BoardConfiguration::BoardConfiguration ( string filePath ){
         mInfoType=NONE;
         readFromFile ( filePath );
     }
@@ -70,7 +70,7 @@ namespace aruco {
     *
     *
     */
-    void BoardConfiguration::saveToFile ( string sfile ) throw ( cv::Exception ) {
+    void BoardConfiguration::saveToFile ( string sfile ){
 
         cv::FileStorage fs ( sfile,cv::FileStorage::WRITE );
         saveToFile ( fs );
@@ -78,7 +78,7 @@ namespace aruco {
     }
     /**Saves the board info to a file
     */
-    void BoardConfiguration::saveToFile ( cv::FileStorage &fs ) throw ( cv::Exception ) {
+    void BoardConfiguration::saveToFile ( cv::FileStorage &fs ){
         fs<<"aruco_bc_nmarkers"<< ( int ) size();
         fs<<"aruco_bc_mInfoType"<< ( int ) mInfoType;
         fs<<"aruco_bc_markers"<<"[";
@@ -98,7 +98,7 @@ namespace aruco {
     *
     *
     */
-    void BoardConfiguration::readFromFile ( string sfile ) throw ( cv::Exception ) {
+    void BoardConfiguration::readFromFile ( string sfile ){
       try{
         cv::FileStorage fs ( sfile,cv::FileStorage::READ );
         readFromFile ( fs );
@@ -110,7 +110,7 @@ namespace aruco {
 
     /**Reads board info from a file
     */
-    void BoardConfiguration::readFromFile ( cv::FileStorage &fs ) throw ( cv::Exception ) {
+    void BoardConfiguration::readFromFile ( cv::FileStorage &fs ){
         int aux=0;
         //look for the nmarkers
         if ( fs["aruco_bc_nmarkers"].name() !="aruco_bc_nmarkers" )
@@ -146,7 +146,7 @@ namespace aruco {
 
     /**
      */
-    const MarkerInfo& BoardConfiguration::getMarkerInfo ( int id ) const throw ( cv::Exception ) {
+    const MarkerInfo& BoardConfiguration::getMarkerInfo ( int id ) const{
         for ( size_t i=0; i<size(); i++ )
             if ( at ( i ).id ==id ) return at ( i );
         throw cv::Exception ( 111,"BoardConfiguration::getMarkerInfo","Marker with the id given is not found",__FILE__,__LINE__ );
@@ -156,7 +156,7 @@ namespace aruco {
 
     /**
      */
-    void Board::glGetModelViewMatrix ( double modelview_matrix[16] ) throw ( cv::Exception ) {
+    void Board::glGetModelViewMatrix ( double modelview_matrix[16] ){
         //check if paremeters are valid
         bool invalid=false;
         for ( int i=0; i<3 && !invalid ; i++ ) {
@@ -208,7 +208,7 @@ namespace aruco {
     /****
      *
      */
-    void Board::OgreGetPoseParameters ( double position[3], double orientation[4] ) throw ( cv::Exception ) {
+    void Board::OgreGetPoseParameters ( double position[3], double orientation[4] ){
         //check if paremeters are valid
         bool invalid=false;
         for ( int i=0; i<3 && !invalid ; i++ ) {
@@ -301,7 +301,7 @@ namespace aruco {
 
     /**Save this from a file
       */
-    void Board::saveToFile ( string filePath ) throw ( cv::Exception ) {
+    void Board::saveToFile ( string filePath ){
         cv::FileStorage fs ( filePath,cv::FileStorage::WRITE );
 
         fs<<"aruco_bo_rvec"<< Rvec;
@@ -328,7 +328,7 @@ namespace aruco {
     }
     /**Read  this from a file
      */
-    void Board::readFromFile ( string filePath ) throw ( cv::Exception ) {
+    void Board::readFromFile ( string filePath ){
         cv::FileStorage fs ( filePath,cv::FileStorage::READ );
         if ( fs["aruco_bo_nmarkers"].name() !="aruco_bo_nmarkers" )
             throw cv::Exception ( 81818,"Board::readFromFile","invalid file type:" ,__FILE__,__LINE__ );
