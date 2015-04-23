@@ -32,17 +32,16 @@ or implied, of Rafael Muñoz Salinas.
 #include <vector>
 #include "exports.h"
 #include "marker.h"
-using namespace std;
 namespace aruco {
 /**
  * 3d representation of a marker
  */
-struct ARUCO_EXPORTS MarkerInfo:public vector<cv::Point3f> {
+struct ARUCO_EXPORTS MarkerInfo : public std::vector<cv::Point3f> {
     MarkerInfo() {}
     MarkerInfo(int _id) {id=_id; }
-    MarkerInfo(const MarkerInfo&MI): vector<cv::Point3f>(MI){id=MI.id; }
+    MarkerInfo(const MarkerInfo&MI): std::vector<cv::Point3f>(MI){id=MI.id; }
     MarkerInfo & operator=(const MarkerInfo&MI){
-	vector<cv::Point3f> ::operator=(MI);
+	std::vector<cv::Point3f> ::operator=(MI);
 	id=MI.id;
 	return *this;
       }
@@ -66,7 +65,7 @@ struct ARUCO_EXPORTS MarkerInfo:public vector<cv::Point3f> {
 */
 
 
-class ARUCO_EXPORTS  BoardConfiguration: public vector<MarkerInfo>
+class ARUCO_EXPORTS  BoardConfiguration: public std::vector<MarkerInfo>
 {
     friend class Board;
 public:
@@ -79,7 +78,7 @@ public:
     /**Loads from file
      * @param filePath to the config file
      */
-    BoardConfiguration(string filePath);
+	BoardConfiguration(std::string filePath);
 
     /**
     */
@@ -90,10 +89,10 @@ public:
     BoardConfiguration & operator=(const BoardConfiguration  &T);
     /**Saves the board info to a file
     */
-    void saveToFile(string sfile);
+    void saveToFile(std::string sfile);
     /**Reads board info from a file
     */
-    void readFromFile(string sfile);
+	void readFromFile(std::string sfile);
     /**Indicates if the corners are expressed in meters
      */
     bool isExpressedInMeters()const {
@@ -112,7 +111,7 @@ public:
     const MarkerInfo& getMarkerInfo(int id)const;
     /**Set in the list passed the set of the ids 
      */
-    void getIdList(vector<int> &ids,bool append=true)const;
+    void getIdList(std::vector<int> &ids,bool append=true)const;
 private:
     /**Saves the board info to a file
     */
@@ -124,7 +123,7 @@ private:
 
 /**
 */
-class ARUCO_EXPORTS Board:public vector<Marker>
+class ARUCO_EXPORTS Board:public std::vector<Marker>
 {
 
 public:
@@ -161,10 +160,10 @@ public:
 
     /**Save this from a file
      */
-    void saveToFile(string filePath);
+	void saveToFile(std::string filePath);
     /**Read  this from a file
      */
-    void readFromFile(string filePath);
+	void readFromFile(std::string filePath);
 
     /**Draws the detected markers
      */

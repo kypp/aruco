@@ -29,7 +29,7 @@ or implied, of Rafael Muñoz Salinas.
 #include "chromaticmask.h"
 #include <set>
 // #include <omp.h>
-
+using namespace std;
 
 /**
  */

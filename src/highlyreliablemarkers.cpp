@@ -29,6 +29,8 @@ or implied, of Rafael Muñoz Salinas.
 #include "highlyreliablemarkers.h"
 #include <assert.h>
 
+using namespace std;
+
 namespace aruco {
 
   // static variables from HighlyReliableMarkers. Need to be here to avoid linking errors

@@ -33,6 +33,7 @@ or implied, of Rafael Muñoz Salinas.
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <assert.h>
+using namespace std;
 using namespace cv;
 namespace aruco {
 /**

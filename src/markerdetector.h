@@ -33,7 +33,6 @@ or implied, of Rafael Muñoz Salinas.
 #include "cameraparameters.h"
 #include "exports.h"
 #include "marker.h"
-using namespace std;
 
 namespace aruco
 {
@@ -59,7 +58,7 @@ class ARUCO_EXPORTS  MarkerDetector
       return *this;
     }
     
-    vector<cv::Point> contour;//all the points of its contour
+    std::vector<cv::Point> contour;//all the points of its contour
     int idx;//index position in the global contour list
   };
 public:
@@ -240,11 +239,11 @@ public:
     * Detection of candidates to be markers, i.e., rectangles.
     * This function returns in candidates all the rectangles found in a thresolded image
     */
-    void detectRectangles(const cv::Mat &thresImg,vector<std::vector<cv::Point2f> > & candidates);
+	void detectRectangles(const cv::Mat &thresImg, std::vector<std::vector<cv::Point2f> > & candidates);
 
     /**Returns a list candidates to be markers (rectangles), for which no valid id was found after calling detectRectangles
      */
-    const vector<std::vector<cv::Point2f> > &getCandidates() {
+	const std::vector<std::vector<cv::Point2f> > &getCandidates() {
         return _candidates;
     }
 
@@ -287,7 +286,7 @@ private:
     * Detection of candidates to be markers, i.e., rectangles.
     * This function returns in candidates all the rectangles found in a thresolded image
     */
-    void detectRectangles(const cv::Mat &thresImg,vector<MarkerCandidate> & candidates);
+	 void detectRectangles(const cv::Mat &thresImg, std::vector<MarkerCandidate> & candidates);
     //Current threshold method
     ThresholdMethods _thresMethod;
     //Threshold parameters
@@ -302,7 +301,7 @@ private:
     bool _doErosion;
     float _borderDistThres;//border around image limits in which corners are not allowed to be detected.
     //vectr of candidates to be markers. This is a vector with a set of rectangles that have no valid id
-    vector<std::vector<cv::Point2f> > _candidates;
+	std::vector<std::vector<cv::Point2f> > _candidates;
     //level of image reduction
     int pyrdown_level;
     //Images
@@ -328,13 +327,13 @@ private:
 // 
 
     //detection of the
-    void findBestCornerInRegion_harris(const cv::Mat  & grey,vector<cv::Point2f> &  Corners,int blockSize);
+	void findBestCornerInRegion_harris(const cv::Mat  & grey, std::vector<cv::Point2f> &  Corners, int blockSize);
    
     
     // auxiliar functions to perform LINES refinement
-    void interpolate2Dline( const vector< cv::Point2f > &inPoints, cv::Point3f &outLine);
+	void interpolate2Dline(const std::vector< cv::Point2f > &inPoints, cv::Point3f &outLine);
     cv::Point2f getCrossPoint(const cv::Point3f& line1, const cv::Point3f& line2);      
-    void distortPoints(vector<cv::Point2f> in, vector<cv::Point2f> &out, const cv::Mat &camMatrix, const cv::Mat &distCoeff);    
+	void distortPoints(std::vector<cv::Point2f> in, std::vector<cv::Point2f> &out, const cv::Mat &camMatrix, const cv::Mat &distCoeff);
     
     
     /**Given a vector vinout with elements and a boolean vector indicating the lements from it to remove, 
@@ -343,7 +342,7 @@ private:
      * @param toRemove
      */
     template<typename T>
-    void removeElements(vector<T> & vinout,const vector<bool> &toRemove)
+	void removeElements(std::vector<T> & vinout, const std::vector<bool> &toRemove)
     {
        //remove the invalid ones by setting the valid in the positions left by the invalids
       size_t indexValid=0;
@@ -363,7 +362,7 @@ private:
     void draw(cv::Mat out,const std::vector<Marker> &markers );
 
     
-    template<typename T> void joinVectors(vector<vector<T> >  &vv,vector<T> &v,bool clearv=false){
+	template<typename T> void joinVectors(std::vector<std::vector<T> >  &vv, std::vector<T> &v, bool clearv = false){
       if (clearv) v.clear();
      for(size_t i=0;i<vv.size();i++)
        for(size_t j=0;j<vv[i].size();j++) v.push_back(vv[i][j]);

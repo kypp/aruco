@@ -32,7 +32,7 @@ or implied, of Rafael Muñoz Salinas.
 #include <opencv2/core/core.hpp>
 #include "exports.h"
 #include "cameraparameters.h"
-using namespace std;
+
 namespace aruco {
 /**\brief This class represents a marker. It is a vector of the fours corners ot the marker
  *
@@ -118,7 +118,7 @@ public:
     }
     /**
      */
-    friend ostream & operator<<(ostream &str,const Marker &M)
+	friend std::ostream & operator<<(std::ostream &str, const Marker &M)
     {
         str<<M.id<<"=";
         for (int i=0;i<4;i++)
