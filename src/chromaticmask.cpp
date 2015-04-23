@@ -33,7 +33,7 @@ or implied, of Rafael Muñoz Salinas.
 
 /**
  */
-EMClassifier::EMClassifier(unsigned int nelements) : _classifier(2, cv::EM::COV_MAT_DIAGONAL, cv::TermCriteria(cv::TermCriteria::COUNT , 4, FLT_EPSILON))
+EMClassifier::EMClassifier(unsigned int nelements) : _classifier(cv::ml::EM::create(cv::ml::EM::Params( 2, cv::ml::EM::COV_MAT_DIAGONAL, cv::TermCriteria(cv::TermCriteria::COUNT, 4, FLT_EPSILON ))))
 {
   _nelem = nelements;
   _threshProb = 0.0001;
@@ -82,12 +82,12 @@ void EMClassifier::train()
     }
   }  
   
-  _classifier.train(samples);
+  _classifier->train(samples);
   
   cv::Mat sampleAux(1,1,CV_64FC1);
   for(unsigned int i=0; i<256; i++) {
     sampleAux.ptr<double>(0)[0] = i;
-    cv::Vec2d r = _classifier.predict(sampleAux);
+    cv::Vec2d r = _classifier->predict(sampleAux);
     _prob[i] = exp(r[0]);
     if(_prob[i]>_threshProb) _inside[i]=true;
     else _inside[i]=false;
@@ -328,7 +328,7 @@ void ChromaticMask::classify(const cv::Mat& in, const aruco::Board &board)
     // apply closing to mask
    cv::Mat maskClose;
   cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3,3));
-  cv::morphologyEx(_mask, maskClose, CV_MOP_CLOSE, element);  
+  cv::morphologyEx(_mask, maskClose, cv::MORPH_CLOSE, element);  
   _mask = maskClose;
   
 }
@@ -411,7 +411,7 @@ void ChromaticMask::classify2(const cv::Mat& in, const aruco::Board &board)
 //     // apply closing to mask
 // _mask=_maskAux;
    cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3,3));
-   cv::morphologyEx(_maskAux,_mask, CV_MOP_CLOSE, element);  
+   cv::morphologyEx(_maskAux, _mask, cv::MORPH_CLOSE, element);
 }
 
 

@@ -54,7 +54,7 @@ public:
 //   double probConj[256];
   
 private:
-  cv::EM _classifier;
+  cv::Ptr<cv::ml::EM> _classifier;
   vector<uchar> _samples;
   bool _inside[256];
   double _prob[256];

@@ -27,6 +27,7 @@ or implied, of Rafael Muñoz Salinas.
 ********************************/
 
 #include "highlyreliablemarkers.h"
+#include <assert.h>
 
 namespace aruco {
 
@@ -290,7 +291,7 @@ namespace aruco {
     assert(in.rows==in.cols);
     cv::Mat grey;
     if ( in.type()==CV_8UC1) grey=in;
-    else cv::cvtColor(in,grey,CV_BGR2GRAY);
+    else cv::cvtColor(in,grey, cv::COLOR_BGR2GRAY);
     //threshold image
     cv::threshold(grey, grey,125, 255, cv::THRESH_BINARY|cv::THRESH_OTSU);
     _swidth=grey.rows/_ncellsBorder;    

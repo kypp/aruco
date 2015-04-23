@@ -29,6 +29,8 @@ or implied, of Rafael Muñoz Salinas.
 #include "subpixelcorner.h"
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
+#include <opencv2/imgproc.hpp>
+#include <opencv2/calib3d.hpp>
 #include <iostream>
 #include <fstream>
 #include "arucofidmarkers.h"
@@ -227,7 +229,7 @@ void MarkerDetector::detect ( const  cv::Mat &input,vector<Marker> &detectedMark
         if ( _cornerMethod==HARRIS )
             findBestCornerInRegion_harris ( grey, Corners,7 );
         else if ( _cornerMethod==SUBPIX )
-            cornerSubPix ( grey, Corners,cvSize ( 5,5 ), cvSize ( -1,-1 )   ,cvTermCriteria ( CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,3,0.05 ) );
+            cornerSubPix ( grey, Corners,cvSize ( 5,5 ), cvSize ( -1,-1 )   ,cvTermCriteria ( TermCriteria::MAX_ITER|TermCriteria::EPS,3,0.05 ) );
 
         //copy back
         for ( unsigned int i=0;i<detectedMarkers.size();i++ )
