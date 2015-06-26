@@ -294,10 +294,12 @@ void MarkerDetector::detectRectangles(const cv::Mat &thresImg,vector<MarkerCandi
     int minSize=_minSize*std::max(thresImg.cols,thresImg.rows)*4;
     int maxSize=_maxSize*std::max(thresImg.cols,thresImg.rows)*4;
     std::vector<std::vector<cv::Point> > contours2;
-    std::vector<cv::Vec4i> hierarchy2;
 
     thresImg.copyTo ( thres2 );
-    cv::findContours ( thres2 , contours2, hierarchy2,CV_RETR_LIST, CV_CHAIN_APPROX_NONE );
+	{
+		std::vector<cv::Vec4i> hierarchy2;
+		cv::findContours(thres2, contours2, hierarchy2, CV_RETR_LIST, CV_CHAIN_APPROX_NONE);
+	}
     vector<Point>  approxCurve;
     ///for each contour, analyze if it is a paralelepiped likely to be the marker
 
@@ -421,7 +423,7 @@ void MarkerDetector::detectRectangles(const cv::Mat &thresImg,vector<MarkerCandi
                 reverse(OutMarkerCanditates.back().contour.begin(),OutMarkerCanditates.back().contour.end());//????
         }
     }
-
+	MarkerCanditates.clear();
 }
 
 /************************************

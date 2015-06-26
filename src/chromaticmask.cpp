@@ -33,8 +33,11 @@ using namespace std;
 
 /**
  */
-EMClassifier::EMClassifier(unsigned int nelements) : _classifier(cv::ml::EM::create(cv::ml::EM::Params( 2, cv::ml::EM::COV_MAT_DIAGONAL, cv::TermCriteria(cv::TermCriteria::COUNT, 4, FLT_EPSILON ))))
+EMClassifier::EMClassifier(unsigned int nelements) : _classifier(cv::ml::EM::create())
 {
+	_classifier->setClustersNumber(2);
+	_classifier->setCovarianceMatrixType(cv::ml::EM::COV_MAT_DIAGONAL);
+	_classifier->setTermCriteria({ cv::TermCriteria::COUNT, 4, FLT_EPSILON });
   _nelem = nelements;
   _threshProb = 0.0001;
   for(unsigned int i=0; i<256; i++) _prob[i] = 0.5;
@@ -81,8 +84,8 @@ void EMClassifier::train()
       idx++;
     }
   }  
-  
-  _classifier->train(samples);
+  //cv::TrainData train_data{}
+  _classifier->train(samples, cv::ml::SampleTypes::ROW_SAMPLE, samples);
   
   cv::Mat sampleAux(1,1,CV_64FC1);
   for(unsigned int i=0; i<256; i++) {
