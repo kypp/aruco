@@ -59,7 +59,7 @@ vector<Marker> TheMarkers;
 BoardDetector TheBoardDetector;
 pair<Board,float> TheBoardDetected; //the board and its probabilit
 BoardConfiguration TheBoardConfig;
-Mat TheInputImage,TheUndInputImage,TheResizedImage;
+Mat TheInputImage,TheUndInputImage,TheResizedImage,TheMask;
 CameraParameters TheCameraParams;
 Size TheGlWindowSize;
 bool TheCaptureFlag=true; 
@@ -68,19 +68,22 @@ void vIdle();
 void vResize( GLsizei iWidth, GLsizei iHeight );
 void vMouse(int b,int s,int x,int y);
 
+
+
 /************************************
  *
  *
  *
  *
  ************************************/
-
 bool readArguments ( int argc,char **argv )
 {
 
     if (argc!=5) {
         cerr<<"Invalid number of arguments"<<endl;
         cerr<<"Usage: (in.avi|live) boardConfig.yml  intrinsics.yml   size "<<endl;
+	cerr<<"WARNING: this test creates a synthetic mask consisting of a single rectangle. "<<endl;
+	cerr<<"WARNING: The only purpose is to show how to create an AR application with mask in OpenGL "<<endl;
         return false;
     }
     TheInputVideo=argv[1];
@@ -121,18 +124,25 @@ int main(int argc,char **argv)
         //read camera paramters if passed
         TheCameraParams.readFromXMLFile(TheIntrinsicFile);
         TheCameraParams.resize( TheInputImage.size());
+	
+	TheBoardDetector.getMarkerDetector().setThresholdParams(25,7);
 
         glutInit(&argc, argv);
         glutInitWindowPosition( 0, 0);
         glutInitWindowSize(TheInputImage.size().width,TheInputImage.size().height);
         glutInitDisplayMode( GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE );
-        glutCreateWindow( "AruCo" );
+        glutCreateWindow( "ArUco" );
         glutDisplayFunc( vDrawScene );
         glutIdleFunc( vIdle );
         glutReshapeFunc( vResize );
         glutMouseFunc(vMouse);
         glClearColor( 0.0, 0.0, 0.0, 1.0 );
         glClearDepth( 1.0 );
+	
+	// these two are necesary for the mask effect
+        glEnable( GL_ALPHA_TEST );
+	glAlphaFunc( GL_GREATER, 0.5 );	
+	
         TheGlWindowSize=TheInputImage.size();
         vResize(TheGlWindowSize.width,TheGlWindowSize.height);
         glutMainLoop();
@@ -144,6 +154,51 @@ int main(int argc,char **argv)
     }
 
 }
+
+
+
+/************************************
+ *
+ *
+ *
+ *
+ ************************************/
+
+cv::Mat createSyntheticMask(const cv::Mat &img) {
+  // just create a mask consisting of a rectangle in the middle of the image
+  // very simple but enough to show how to employ mask in opengl
+  cv::Mat mask(img.size(), CV_8UC1, cv::Scalar::all(255)); // 255 means it is hidden
+  cv::rectangle(mask,cv::Rect(img.cols/4, img.rows/4, img.cols/2, img.rows/2), cv::Scalar(0), CV_FILLED); //create visible (0) rectangle
+  return mask;
+}
+
+
+
+
+/************************************
+ *
+ *
+ *
+ *
+ ************************************/
+
+cv::Mat createMultiChannelMask(const cv::Mat &img, const cv::Mat &mask)
+{
+  cv::Mat out(img.size(), CV_8UC4, cv::Scalar::all(0));
+  for(int i=0; i<img.total(); i++) {
+    for(int j=0; j<3; j++) out.ptr<cv::Vec4b>()[i][j] = img.ptr<cv::Vec3b>()[i][j];
+    if(mask.size()==img.size()) out.ptr<cv::Vec4b>()[i][3] = mask.ptr<unsigned char>()[i];
+  }
+  return out;
+}
+
+
+
+
+
+
+
+
 /************************************
  *
  *
@@ -222,20 +277,20 @@ void vDrawScene()
     //now, for each marker,
     double modelview_matrix[16];
 
-    /*    for (unsigned int m=0;m<TheMarkers.size();m++)
-        {
-            TheMarkers[m].glGetModelViewMatrix(modelview_matrix);
-            glMatrixMode(GL_MODELVIEW);
-            glLoadIdentity();
-            glLoadMatrixd(modelview_matrix);
-    // 		axis(TheMarkerSize);
-            glColor3f(1,0.4,0.4);
-            glTranslatef(0, TheMarkerSize/2,0);
-            glPushMatrix();
-            glutWireCube( TheMarkerSize );
-
-            glPopMatrix();
-        }*/
+//         for (unsigned int m=0;m<TheMarkers.size();m++)
+//         {
+//             TheMarkers[m].glGetModelViewMatrix(modelview_matrix);
+//             glMatrixMode(GL_MODELVIEW);
+//             glLoadIdentity();
+//             glLoadMatrixd(modelview_matrix);
+//     // 		axis(TheMarkerSize);
+//             glColor3f(1,0.4,0.4);
+//             glTranslatef(0, TheMarkerSize/2,0);
+//             glPushMatrix();
+//             glutWireCube( TheMarkerSize );
+// 
+//             glPopMatrix();
+//         }
     //If the board is detected with enough probability
     if (TheBoardDetected.second>0.3) {
         TheBoardDetected.first.glGetModelViewMatrix(modelview_matrix);
@@ -247,9 +302,15 @@ void vDrawScene()
         if(TheBoardDetector.isYPerpendicular()) glTranslatef(0,TheMarkerSize/2,0);
 	else glTranslatef(0,0,TheMarkerSize/2);
         glPushMatrix();
-        glutWireCube( TheMarkerSize );
+//         glutWireCube( TheMarkerSize );
+	glutWireTeapot(2*TheMarkerSize);
         glPopMatrix();
     }
+
+    // After drawing everything, now draw mask
+    cv::Mat multiChannelMask = createMultiChannelMask(TheResizedImage, TheMask);
+    // now redraw to create the mask effect, and thats all
+    glDrawPixels ( TheGlWindowSize.width , TheGlWindowSize.height , GL_RGBA , GL_UNSIGNED_BYTE , multiChannelMask.ptr(0) );
 
     glutSwapBuffers();
 
@@ -280,6 +341,8 @@ void vIdle()
         //chekc the speed by calculating the mean speed of all iterations
         //resize the image to the size of the GL window
         cv::resize(TheUndInputImage,TheResizedImage,TheGlWindowSize);
+	// create mask. It is a syntetic mask consisting of a simple rectangle, just to show a example of opengl with mask
+	TheMask = createSyntheticMask(TheResizedImage); // lets create with the same size of the resized image, i.e. the size of the opengl window
     }
     glutPostRedisplay();
 }
