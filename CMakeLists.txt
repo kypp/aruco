@@ -87,7 +87,13 @@ ENDIF()
 
 
 if(WIN32)
- 
+  if (MSVC)
+    if (USE_OPENMP)
+      set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /openmp")
+      set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /openmp")
+      add_definitions(-DUSE_OMP)
+    endif (USE_OPENMP)
+  endif (MSVC)
 ELSE()
 find_package(OpenMP  )
 if (OPENMP_FOUND)
